@@ -1,12 +1,12 @@
 [project]
 name = "dmt-auto-gui"
-version = "0.1.02"
+version = "0.1.08"
 description = ""
 authors = [
     {name = "Daniel",email = "daniel.mtorres7@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "pyperclip (>=1.9.0,<2.0.0)",
     "pyautogui (>=0.9.54,<0.10.0)",
