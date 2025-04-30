@@ -1,6 +1,6 @@
 [project]
 name = "dmt-auto-gui"
-version = "0.1.08"
+version = "0.1.22"
 description = ""
 authors = [
     {name = "Daniel",email = "daniel.mtorres7@gmail.com"}

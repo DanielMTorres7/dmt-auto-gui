@@ -1,5 +1,7 @@
+import inspect
+from pathlib import Path
+import os
 import pyautogui
-import os 
 from .models import Model_Error
 import logging
 
@@ -18,19 +20,38 @@ class ScreenController:
         except Exception as e:
             return Model_Error(f"Erro ao pegar tamanho da tela: {e}", 500)
 
-    def take_screenshot(self, file_name: str, region=None) -> str | Model_Error: # Return path or error
-        """Takes a screenshot and saves it to the specified file."""
+    def take_screenshot(self, file_name: str, region=None) -> str | Model_Error:
+        """Takes a screenshot and saves it in the caller's directory under 'screenshots' folder."""
         try:
-            self.logger.info(f"Tirando screenshot da tela")
-            screenshot = pyautogui.screenshot(region=region) # Use region parameter
-            full_path = file_name
-            if not os.path.exists(full_path): # Check if it's a full path
-                # Try relative path in the same directory as the script
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                full_path = os.path.join(script_dir, file_name)
-            screenshot.save(full_path)
-            self.logger.info(f"Screenshot salvo em: {full_path}")
-            return full_path # Return the file path
+            self.logger.info("Taking screenshot")
+            
+            # Get caller's directory
+            caller_dir = self._get_caller_directory()
+            screenshots_dir = caller_dir
+            
+            # Create screenshots directory if it doesn't exist
+            screenshots_dir.mkdir(exist_ok=True)
+            
+            # Generate full path
+            full_path = screenshots_dir / file_name
+            
+            # Take and save screenshot
+            pyautogui.screenshot(region=region).save(str(full_path))
+            self.logger.info(f"Screenshot saved to: {full_path}")
+            return str(full_path)
+            
         except Exception as e:
-            self.logger.error(f"Erro ao tirar screenshot: {e}")
-            return Model_Error(f"Erro ao tirar screenshot: {e}", 500)
+            self.logger.error(f"Screenshot error: {e}")
+            return Model_Error(f"Screenshot error: {e}", 500)
+
+    def _get_caller_directory(self) -> Path:
+        """Finds the directory of the immediate caller script."""
+        stack = inspect.stack()
+        for frame in stack[2:]:  # Skip current and take_screenshot frames
+            try:
+                path = Path(frame.filename).resolve()
+                if not any(p in str(path) for p in ("site-packages", "python", "lib")):
+                    return path.parent
+            except (AttributeError, IndexError):
+                continue
+        return Path.cwd()  # Fallback to current directory
