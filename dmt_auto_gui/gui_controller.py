@@ -10,8 +10,7 @@ import inspect
 
 class GUIController:
     def __init__(self, logger: logging.Logger = None):
-        self.logger = logger
-        self.base_path = self._get_caller_directory()  # Define a base_path ao criar a instância
+        self.logger = logger  # Define a base_path ao criar a instância
 
     def _get_caller_directory(self):
         """Encontra o diretório do script chamador imediatamente anterior na pilha de execução."""
@@ -67,7 +66,7 @@ class GUIController:
         """
         full_path = Path(file_name)
         if not full_path.is_absolute():
-            full_path = (self.base_path / file_name).resolve()
+            full_path = (self._get_caller_directory() / file_name).resolve()
 
         if not full_path.exists():
             self.logger.info(f"Arquivo {full_path} não encontrado!")
